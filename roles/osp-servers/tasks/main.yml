@@ -9,7 +9,7 @@
     flavor: "{{ item.value.flavor }}"
     security_groups: "{{ item.value.security_group }}"
     delete_fip: yes
-    wait: "{{ item.value.wait }}"
+    wait: no
     nics:
       - net-name: int_network
     meta: "{{ item.value.meta }}"

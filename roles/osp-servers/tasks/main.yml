@@ -1,3 +1,31 @@
 ---
-
 # tasks file for osp.servers
+- name: Create instances
+  os_server:
+    cloud: openstack
+    name: "{{ item.name }}"
+    image: "{{ item.image }}"
+    key_name: "{{ item.key_name }}"
+    flavor: "{{ item.flavor }}"
+    security_groups: "{{ item.security_group }}"
+    delete_fip: yes
+    wait: "{{ item.wait }}"
+    nics:
+      - net-name: int_network
+    meta: "{{ item.meta }}"
+    userdata: |
+      #!/bin/bash 
+      curl -o /tmp/openstack.pub http://www.opentlc.com/download/ansible_bootcamp/openstack_keys/openstack.pub 
+      cat /tmp/openstack.pub >> /home/cloud-user/.ssh/authorized_keys
+  loop: "{{ osp_servers }}"
+
+- name: Add floating IP to instance
+  os_floating_ip:
+    cloud: openstack
+    state: "{{ item.state }}"
+    reuse: yes
+    server: "{{ item.name }}"
+    network: ext_network
+    wait: true
+    timeout: 200
+  loop: "{{ osp_servers }}"
